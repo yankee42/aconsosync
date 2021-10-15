@@ -1,25 +1,31 @@
 package com.github.yankee42.aconsosync
 
 import HttpXsrf
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
-import io.ktor.client.features.cookies.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.receive
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.features.ResponseException
+import io.ktor.client.features.cookies.HttpCookies
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.features.json.serializer.KotlinxSerializer
+import io.ktor.client.request.accept
+import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.get
+import io.ktor.http.ContentType
+import io.ktor.http.Cookie
+import io.ktor.http.CookieEncoding
+import io.ktor.http.URLBuilder
+import io.ktor.http.Url
+import io.ktor.http.clone
+import io.ktor.http.parametersOf
+import io.ktor.http.takeFrom
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import java.lang.RuntimeException
+import java.nio.file.Path
 
 class AconsoSync(private val http: HttpClient,
                  rootUrl: Url,
@@ -85,6 +91,26 @@ class AconsoSync(private val http: HttpClient,
 class LoginFailedException(msg: String, cause: Throwable) : RuntimeException(msg, cause)
 
 const val XSRF_COOKIE = "XSRF-TOKEN"
+
+fun aconsoSync(
+    rootUrl: Url,
+    localDir: Path,
+    username: String,
+    password: String,
+    eventListener: (event: AconsoEvent) -> Unit
+) {
+    runBlocking {
+        createHttpClient(rootUrl).use { httpClient ->
+            AconsoSync(
+                httpClient,
+                rootUrl,
+                LocalRepository(localDir),
+                eventListener
+            )
+                .syncDocuments(username, password)
+        }
+    }
+}
 
 fun createHttpClient(rootUrl: Url) = HttpClient(CIO) {
     install(HttpCookies) {

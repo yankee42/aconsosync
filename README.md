@@ -14,3 +14,9 @@ This application "fixes" that:
 - It assigns meaningful filenames
 
 This application is in no way affiliated or endorsed by Aconso.
+
+# Running
+
+Use `java -jar aconsosync.jar` or just click&run from your favorite file browser in order to start the GUI.
+
+`java -jar aconsosync.jar headless [options]` can be used to run in headless mode. Running without options shows a help page with more information. 
