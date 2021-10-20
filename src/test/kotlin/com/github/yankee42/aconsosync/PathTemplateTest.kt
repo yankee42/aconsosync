@@ -52,7 +52,11 @@ class PathTemplateTest {
             arrayOf("-{id}.{name}-", "-$SAMPLE_ID.$SAMPLE_NAME-"),
 
             // retains slashes so directories are possible
-            arrayOf("dir/file", "dir/file")
+            arrayOf("dir/file", "dir/file"),
+
+            // allows regex replace in names
+            arrayOf("{name:s/[Nae]/!/}", "n!m!"),
+            arrayOf("{name:s/[Ae]/!/i}", "n!m!"),
         )
     }
 }

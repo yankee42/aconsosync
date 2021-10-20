@@ -42,7 +42,20 @@ private fun String.literalSegment(start: Int, end: Int = length): TemplateSegmen
 
 private fun String.dynamicSegment(nameStart: Int, nameEnd: Int, argStart: Int, argEnd: Int): TemplateSegment {
     when {
-        regionMatches(nameStart, "name") -> return { append(it.fileName.replace('/', '-')) }
+        regionMatches(nameStart, "name") -> {
+            if (argStart >= 0) {
+                val argument = substring(argStart, argEnd)
+                val match = "^s/(.*?[^\\\\])/(.*)/(i?)$".toRegex().find(argument)
+                    ?: throw IllegalArgumentException("Illegal argument <$argument>")
+                val regexString = match.groupValues[1]
+                val replacementString = match.groupValues[2]
+                val optionsString = match.groupValues[3]
+                val regex =
+                    if (optionsString.isEmpty()) regexString.toRegex() else regexString.toRegex(RegexOption.IGNORE_CASE)
+                return { append(it.fileName.replace('/', '-').replace(regex, replacementString)) }
+            }
+            return { append(it.fileName.replace('/', '-')) }
+        }
         regionMatches(nameStart, "id") -> return { append(it.fileId) }
         regionMatches(nameStart, "date") -> {
             val format = DateTimeFormatter.ofPattern(if (argStart >= 0) substring(argStart, argEnd) else "YYYY-MM-DD")

@@ -24,7 +24,8 @@ Use `java -jar aconsosync.jar` or just click&run from your favorite file browser
 # Usage notes
 
 The file name pattern allows to set a custom pattern for naming files. The following variables can be used:
-- `{name}` - The name of the document"
+- `{name}` - The name of the document
+- `{name:s/PATTERN/REPLACEMENT/OPTIONS}` the name of the document transformed by a regular expression. The format is intended to be similar to the format used by `sed`. Only one option is supported: `i` for case insensitive. 
 - `{id}` - The file id reported by Aconso"
 - `{date}` - The date of the document in format YYYY-MM-DD"
 - `{date:YYYYMMDD}` - The date of the document using a custom format as used by Java's DateTimeFormatter"
