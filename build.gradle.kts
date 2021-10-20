@@ -15,7 +15,6 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.31")
     implementation("ch.qos.logback:logback-classic:1.2.6")
     implementation("io.ktor:ktor-client-cio:1.6.4")
     implementation("io.ktor:ktor-client-core:1.6.4")
@@ -24,6 +23,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
     implementation("info.picocli:picocli:4.6.1")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.31")
+    testImplementation("org.hamcrest:hamcrest:2.2")
+    testImplementation("org.testng:testng:7.4.0")
 }
 
 tasks.test {

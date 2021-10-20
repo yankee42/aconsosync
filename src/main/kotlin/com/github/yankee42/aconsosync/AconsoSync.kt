@@ -97,6 +97,7 @@ fun aconsoSync(
     localDir: Path,
     username: String,
     password: String,
+    fileNameTemplate: PathTemplate,
     eventListener: (event: AconsoEvent) -> Unit
 ) {
     runBlocking {
@@ -104,7 +105,7 @@ fun aconsoSync(
             AconsoSync(
                 httpClient,
                 rootUrl,
-                LocalRepository(localDir),
+                LocalRepository(localDir, fileNameTemplate),
                 eventListener
             )
                 .syncDocuments(username, password)

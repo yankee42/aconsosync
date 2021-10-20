@@ -3,6 +3,7 @@ package com.github.yankee42.aconsosync.gui
 import com.github.yankee42.aconsosync.AconsoSync
 import com.github.yankee42.aconsosync.LocalRepository
 import com.github.yankee42.aconsosync.LoginFailedException
+import com.github.yankee42.aconsosync.PathTemplate
 import com.github.yankee42.aconsosync.createHttpClient
 import io.ktor.http.Url
 import kotlinx.coroutines.runBlocking
@@ -37,11 +38,13 @@ class MainFrame : JFrame("Aconso Sync") {
     private val passwordField = JPasswordField()
     private val savePasswordField = JCheckBox("", true)
     private val localDirField = JTextField()
+    private val fileNamePatternField = JTextField("{name}_{id}.pdf")
     private val preferences = arrayOf(
         urlField.asPreference("url"),
         usernameField.asPreference("username"),
         savePasswordField.asPreference("savePassword"),
         localDirField.asPreference("localDir"),
+        fileNamePatternField.asPreference("fileNamePattern"),
         "password".let { name ->
             Preference(
                 { passwordField.text = it.get(name, "") },
@@ -78,9 +81,12 @@ class MainFrame : JFrame("Aconso Sync") {
             } } })
         }, constraints(4, 1))
 
+        add(JLabel("File name pattern:"), constraints(5, 0))
+        add(fileNamePatternField, constraints(5, 1))
+
         add(
             JButton("Save Settings & Sync").apply { addActionListener { sync() } },
-            constraints(5, 0).apply { gridwidth = 2 }
+            constraints(6, 0).apply { gridwidth = 2 }
         )
 
         loadPreferences()
@@ -93,7 +99,7 @@ class MainFrame : JFrame("Aconso Sync") {
         swingWorker {
             savePreferences()
             try {
-                doSync(Url(urlField.text), statusFrame)
+                doSync(statusFrame)
             } catch (e: LoginFailedException) {
                 logger.error("Login failed", e)
                 SwingUtilities.invokeLater { JOptionPane.showMessageDialog(
@@ -104,13 +110,14 @@ class MainFrame : JFrame("Aconso Sync") {
         statusFrame.isVisible = true
     }
 
-    private fun doSync(rootUrl: Url, statusFrame: StatusFrame) {
+    private fun doSync(statusFrame: StatusFrame) {
+        val rootUrl = Url(urlField.text)
         runBlocking {
             createHttpClient(rootUrl).use { httpClient ->
                 AconsoSync(
                     httpClient,
                     rootUrl,
-                    LocalRepository(Paths.get(localDirField.text))
+                    LocalRepository(Paths.get(localDirField.text), PathTemplate(fileNamePatternField.text)),
                 ) { statusFrame.processEvent(it) }
                     .syncDocuments(usernameField.text, passwordField.password.concatToString())
             }

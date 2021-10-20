@@ -20,3 +20,13 @@ This application is in no way affiliated or endorsed by Aconso.
 Use `java -jar aconsosync.jar` or just click&run from your favorite file browser in order to start the GUI.
 
 `java -jar aconsosync.jar headless [options]` can be used to run in headless mode. Running without options shows a help page with more information. 
+
+# Usage notes
+
+The file name pattern allows to set a custom pattern for naming files. The following variables can be used:
+- `{name}` - The name of the document"
+- `{id}` - The file id reported by Aconso"
+- `{date}` - The date of the document in format YYYY-MM-DD"
+- `{date:YYYYMMDD}` - The date of the document using a custom format as used by Java's DateTimeFormatter"
+
+A forward slash (`/`) can be used to designate directories. E.g. the pattern `{date:YYYY}/{name}.pdf` will create one directory for each year with documents and places the documents within. 
